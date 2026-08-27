@@ -1,5 +1,5 @@
-import React from 'react';
-import { Shield, Banknote, TrendingUp, AlertTriangle, Building, RotateCcw, Calendar, ExternalLink } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Shield, Banknote, TrendingUp, AlertTriangle, Building, RotateCcw, Calendar, ExternalLink, Download, Upload, Database, X } from 'lucide-react';
 import { formatBRL } from '../services/financialMath';
 
 export default function Header({
@@ -13,9 +13,55 @@ export default function Header({
   netBalance,
   totalDebts,
   onOpenBankModal,
-  onResetData
+  onResetData,
+  incomesData = [],
+  expensesData = [],
+  banksData = [],
+  onImportBackup
 }) {
   const isDeficit = netBalance < 0;
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleExportJson = () => {
+    const backupData = {
+      version: '2.0',
+      exportedAt: new Date().toISOString(),
+      incomes: incomesData,
+      expenses: expensesData,
+      banks: banksData
+    };
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `finplan-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const parsed = JSON.parse(evt.target?.result);
+        if (parsed.incomes && parsed.expenses) {
+          if (onImportBackup) {
+            onImportBackup(parsed);
+            alert('Backup importado com sucesso! Todos os seus dados foram restaurados.');
+            setShowSyncModal(false);
+          }
+        } else {
+          alert('Arquivo de backup inválido.');
+        }
+      } catch (err) {
+        alert('Erro ao ler arquivo JSON: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
@@ -104,6 +150,16 @@ export default function Header({
               </button>
             </div>
 
+            {/* Backup & Sync Button */}
+            <button
+              onClick={() => setShowSyncModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-indigo-950/80 hover:bg-indigo-900/90 text-indigo-300 border border-indigo-700/60 transition-all shadow-sm"
+              title="Exportar ou Importar seus dados editados (Backup JSON)"
+            >
+              <Database className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Backup & Sincronizar</span>
+            </button>
+
             <button
               onClick={onOpenBankModal}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all shadow-sm"
@@ -120,8 +176,8 @@ export default function Header({
               title="Abrir Repositório no GitHub"
             >
               <svg className="w-3.5 h-3.5 text-white fill-current" viewBox="0 0 24 24">
-    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-  </svg>
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
               <span>GitHub</span>
               <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
             </a>
@@ -146,9 +202,9 @@ export default function Header({
           <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3">
             <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Despesas ({selectedMonth})</span>
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+              <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
             </div>
-            <div className="text-lg font-bold text-rose-400">
+            <div className="text-lg font-bold text-red-400">
               {formatBRL(totalExpenses)}
             </div>
             <div className="text-[10px] text-slate-500 mt-0.5">
@@ -165,7 +221,7 @@ export default function Header({
               {formatBRL(netBalance)}
             </div>
             <div className="text-[10px] text-slate-500 mt-0.5">
-              {isDeficit ? 'Déficit pontual' : 'Superávit / Caixa Livre'}
+              {isDeficit ? 'Déficit / Ajustar gastos' : 'Superávit / Caixa Livre'}
             </div>
           </div>
 
@@ -183,6 +239,70 @@ export default function Header({
           </div>
         </div>
       </div>
+
+      {/* Backup & Sync Modal */}
+      {showSyncModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <Database className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-base font-bold text-white">Sincronizar & Backup do Seu Orçamento</h3>
+              </div>
+              <button onClick={() => setShowSyncModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Use esta ferramenta para <strong>levar todos os seus dados editados do computador local para a Vercel, celular ou outro dispositivo</strong> em apenas 1 clique!
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleExportJson}
+                className="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-indigo-500/40 text-center transition-all group"
+              >
+                <Download className="w-6 h-6 text-indigo-400 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold text-white">1. Baixar Backup (.json)</span>
+                <span className="text-[10px] text-slate-400 mt-1">Salva todos os valores, IPVAs e edições</span>
+              </button>
+
+              <label className="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-emerald-500/40 text-center transition-all group cursor-pointer">
+                <Upload className="w-6 h-6 text-emerald-400 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold text-white">2. Carregar Backup</span>
+                <span className="text-[10px] text-slate-400 mt-1">Importa o arquivo na Vercel ou celular</span>
+                <input
+                  type="file"
+                  accept=".json"
+                  ref={fileInputRef}
+                  onChange={handleImportFile}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-slate-300">
+              💡 <strong>Como sincronizar com a Vercel:</strong>
+              <ol className="list-decimal list-inside mt-1 space-y-1 text-slate-400">
+                <li>Aqui no seu computador, clique em <strong>"Baixar Backup"</strong>.</li>
+                <li>Abra o seu site na Vercel e clique em <strong>"Backup & Sincronizar" ➔ "Carregar Backup"</strong>.</li>
+                <li>Seus dados, nomes e valores editados estarão 100% sincronizados!</li>
+              </ol>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setShowSyncModal(false)}
+                className="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white rounded-lg"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

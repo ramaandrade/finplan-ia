@@ -51,7 +51,7 @@ export const INITIAL_BANKS = [
     parcelamentoRate: 5.4,
     chequeEspecialRate: 8.0,
     chequeSpecialLimit: 2500,
-    notes: 'Cheque especial utilizado em Setembro (R$ 1.700). Fatura alta de R$ 2.000 em Setembro reduz para R$ 554 a partir de Outubro.'
+    notes: 'Cheque especial utilizado em Setembro (R$ 1.700). Fatura alta de R$ 1.553 em Setembro reduz para R$ 554 nos meses seguintes.'
   },
   {
     id: 'nubank',
@@ -70,7 +70,7 @@ export const INITIAL_BANKS = [
     loanRemainingInstallments: 8,
     loanInstallmentValue: 562.19,
     loanBalance: 3980.00,
-    notes: 'Empréstimo ativo (R$ 562,19/mês). Fatura de R$ 1.138 em Setembro estabiliza em R$ 885 nos meses seguintes.'
+    notes: 'Empréstimo ativo (R$ 562,19/mês). Fatura de R$ 1.277 em Setembro estabiliza em R$ 853 nos meses seguintes.'
   },
   {
     id: 'c6',
@@ -89,7 +89,7 @@ export const INITIAL_BANKS = [
     loanRemainingInstallments: 10,
     loanInstallmentValue: 392.00,
     loanBalance: 3350.00,
-    notes: 'Empréstimo conserto do Carro (R$ 400 em Set e R$ 392/mês). Fatura do cartão quita em Dezembro.'
+    notes: 'Empréstimo conserto do Carro (R$ 392/mês). Fatura do cartão (R$ 340) quita em Dezembro.'
   },
   {
     id: 'mercadopago',
@@ -104,7 +104,7 @@ export const INITIAL_BANKS = [
     cardDueDay: 5,
     rotativoRate: 16.5,
     parcelamentoRate: 6.2,
-    notes: 'Fatura de R$ 1.162 em Setembro diminui progressivamente (R$ 522 Out, R$ 468 Nov, R$ 455 Dez).'
+    notes: 'Fatura de R$ 943 em Setembro diminui progressivamente (R$ 886 Out, R$ 468 Nov, R$ 455 Dez).'
   }
 ];
 
@@ -113,7 +113,7 @@ export const INITIAL_INCOMES = [
   { id: 'encerramento_bradesco', name: 'Encerramento de Empréstimo Bradesco', type: 'recurrent', isRecurring: true, values: populate2027Values({ SET: 1340, OUT: 1340, NOV: 1340, DEZ: 1340 }), note: 'Margem líquida liberada / Entrada mensal fixa' },
   { id: 'emprestimo_in', name: 'Empréstimo (Entrada extra)', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   { id: 'majoracao', name: 'Majoração', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
-  { id: 'decimo_terceiro', name: '13º Salário', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }), note: 'Disponível em Nov/Dez para quitação de empréstimos' },
+  { id: 'decimo_terceiro', name: '13º Salário', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 1000 }), note: 'Disponível em Nov/Dez para quitação de empréstimos' },
   { id: 'ferias', name: 'Férias', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   { id: 'programador', name: 'Programador ? (Freelance)', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }), note: 'Potencial de renda extra' }
 ];
@@ -127,23 +127,33 @@ export const INITIAL_EXPENSES = [
   { id: 'brisanet', name: 'Brisanet', category: 'Telecom', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 140, OUT: 140, NOV: 140, DEZ: 140 }) },
   
   // Dívidas e Cartões
-  { id: 'fatura_nubank', name: 'Fatura Cartão NUBANK', category: 'Cartão de Crédito', bank: 'Nubank', isDebt: true, debtType: 'card', rate: 14.8, values: populate2027Values({ SET: 1138, OUT: 885, NOV: 885, DEZ: 885 }) },
+  { id: 'fatura_nubank', name: 'Fatura Cartão NUBANK', category: 'Cartão de Crédito', bank: 'Nubank', isDebt: true, debtType: 'card', rate: 14.8, values: populate2027Values({ SET: 1277, OUT: 853, NOV: 853, DEZ: 853 }) },
   { id: 'emp_nubank', name: 'Empréstimo NUBANK', category: 'Empréstimos', bank: 'Nubank', isDebt: true, debtType: 'loan', rate: 4.15, values: populate2027Values({ SET: 562.19, OUT: 562.19, NOV: 562.19, DEZ: 562.19 }), remainingMonths: 8, totalBalance: 3980.00 },
-  { id: 'fatura_c6', name: 'Fatura C6', category: 'Cartão de Crédito', bank: 'C6 Bank', isDebt: true, debtType: 'card', rate: 14.1, values: populate2027Values({ SET: 171, OUT: 171, NOV: 154, DEZ: 0 }) },
-  { id: 'emp_c6', name: 'Empréstimo conserto do Carro C6', category: 'Empréstimos', bank: 'C6 Bank', isDebt: true, debtType: 'loan', rate: 3.90, values: populate2027Values({ SET: 400, OUT: 392, NOV: 392, DEZ: 392 }), remainingMonths: 10, totalBalance: 3350.00 },
-  { id: 'fatura_bradesco', name: 'Fatura Bradesco', category: 'Cartão de Crédito', bank: 'Bradesco', isDebt: true, debtType: 'card', rate: 15.2, values: populate2027Values({ SET: 2000, OUT: 554, NOV: 554, DEZ: 554 }) },
-  { id: 'fatura_mp', name: 'Fatura Mercado Pago', category: 'Cartão de Crédito', bank: 'Mercado Pago', isDebt: true, debtType: 'card', rate: 16.5, values: populate2027Values({ SET: 1162, OUT: 522, NOV: 468, DEZ: 455 }) },
+  { id: 'fatura_c6', name: 'Fatura C6', category: 'Cartão de Crédito', bank: 'C6 Bank', isDebt: true, debtType: 'card', rate: 14.1, values: populate2027Values({ SET: 340, OUT: 340, NOV: 154, DEZ: 0 }) },
+  { id: 'emp_c6', name: 'Empréstimo conserto do Carro C6', category: 'Empréstimos', bank: 'C6 Bank', isDebt: true, debtType: 'loan', rate: 3.90, values: populate2027Values({ SET: 392, OUT: 392, NOV: 392, DEZ: 392 }), remainingMonths: 10, totalBalance: 3350.00 },
+  { id: 'fatura_bradesco', name: 'Fatura Bradesco', category: 'Cartão de Crédito', bank: 'Bradesco', isDebt: true, debtType: 'card', rate: 15.2, values: populate2027Values({ SET: 1553, OUT: 1553, NOV: 554, DEZ: 554 }) },
+  { id: 'fatura_mp', name: 'Fatura Mercado Pago', category: 'Cartão de Crédito', bank: 'Mercado Pago', isDebt: true, debtType: 'card', rate: 16.5, values: populate2027Values({ SET: 943, OUT: 886, NOV: 468, DEZ: 455 }) },
   { id: 'fatura_credishop', name: 'Fatura Credi Shop', category: 'Cartão de Crédito', bank: 'Credi Shop', isDebt: true, debtType: 'card', rate: 15.0, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   
   // Gastos Pessoais & Outros
   { id: 'tmb_ingles', name: 'TMB Inglês', category: 'Educação', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 110, OUT: 110, NOV: 110, DEZ: 110 }) },
-  { id: 'loterias', name: 'Loterias', category: 'Lazer', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 144, OUT: 144, NOV: 144, DEZ: 144 }), note: 'Candidato a corte para desafogar Setembro' },
+  { id: 'loterias', name: 'Loterias', category: 'Lazer', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 144, OUT: 144, NOV: 144, DEZ: 144 }) },
   { id: 'casa_esperanca', name: 'Casa Esperança e Vida', category: 'Doações', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 60, OUT: 60, NOV: 60, DEZ: 60 }) },
   { id: 'compra_casa', name: 'Compra da Casa', category: 'Imóveis', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
-  { id: 'cheque_especial', name: 'Cheque Especial', category: 'Cheque Especial', bank: 'Bradesco', isDebt: true, debtType: 'overdraft', rate: 8.0, values: populate2027Values({ SET: 1700, OUT: 0, NOV: 0, DEZ: 0 }), note: 'Crítico: R$ 1.700 cobrado em Setembro' },
-  { id: 'baba', name: 'Babá', category: 'Família & Pessoal', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 500, OUT: 500, NOV: 500, DEZ: 500 }) },
-  { id: 'ipva_hb20', name: 'IPVA HB20', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'cheque_especial', name: 'Cheque Especial', category: 'Cheque Especial', bank: 'Bradesco', isDebt: true, debtType: 'overdraft', rate: 8.0, values: populate2027Values({ SET: 1700, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'baba', name: 'Babá', category: 'Família', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 500, OUT: 500, NOV: 500, DEZ: 500 }) },
+  
+  // Veículos - Grupo IPVAs
+  { id: 'ipva_mobi', name: 'IPVA MOBI', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'ipva_c3', name: 'IPVA C3', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   { id: 'ipva_shineray', name: 'IPVA SHINERAY', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  
+  // Veículos - Grupo Licenciamentos
+  { id: 'licenciamento_mobi', name: 'Licenciamento MOBI', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'licenciamento_c3', name: 'Licenciamento C3', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'licenciamento_shineray', name: 'Licenciamento SHINERAY', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  
+  // Outros
   { id: 'corecon_c6', name: 'CORECON - C6', category: 'Profissional', bank: 'C6 Bank', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   { id: 'amazon_bradesco', name: 'Amazon (na fatura do Bradesco)', category: 'Assinaturas', bank: 'Bradesco', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   

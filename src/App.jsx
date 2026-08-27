@@ -201,6 +201,22 @@ export default function App() {
     }));
   };
 
+  
+  const handleImportBackup = (backup) => {
+    if (backup.incomes) {
+      setIncomes(backup.incomes);
+      localStorage.setItem('finplan_incomes_v2', JSON.stringify(backup.incomes));
+    }
+    if (backup.expenses) {
+      setExpenses(backup.expenses);
+      localStorage.setItem('finplan_expenses_v2', JSON.stringify(backup.expenses));
+    }
+    if (backup.banks) {
+      setBanks(backup.banks);
+      localStorage.setItem('finplan_banks_v2', JSON.stringify(backup.banks));
+    }
+  };
+
   const handleReset = () => {
     if (window.confirm('Restaurar todos os dados do orçamento para os valores originais?')) {
       setIncomes(INITIAL_INCOMES);
@@ -243,6 +259,10 @@ export default function App() {
         totalDebts={totalDebts}
         onOpenBankModal={() => setIsBankModalOpen(true)}
         onResetData={handleReset}
+        incomesData={incomes}
+        expensesData={expenses}
+        banksData={banks}
+        onImportBackup={handleImportBackup}
       />
 
       <div className="border-b border-slate-800/80 bg-slate-900/40 sticky top-0 z-30 backdrop-blur-md">
