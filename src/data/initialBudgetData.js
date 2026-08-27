@@ -149,9 +149,9 @@ export const INITIAL_EXPENSES = [
   { id: 'ipva_shineray', name: 'IPVA SHINERAY', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   
   // Veículos - Grupo Licenciamentos
-  { id: 'licenciamento_mobi', name: 'Licenciamento MOBI', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
-  { id: 'licenciamento_c3', name: 'Licenciamento C3', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
-  { id: 'licenciamento_shineray', name: 'Licenciamento SHINERAY', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'licenciamento_mobi', name: 'Licenciamento MOBI Final 2', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'licenciamento_c3', name: 'Licenciamento C3 Final 4', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'licenciamento_shineray', name: 'Licenciamento SHINERAY Final 9', category: 'Veículos', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   
   // Outros
   { id: 'corecon_c6', name: 'CORECON - C6', category: 'Profissional', bank: 'C6 Bank', isDebt: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
