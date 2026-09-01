@@ -86,6 +86,25 @@ export default function App() {
     return INITIAL_EXPENSES;
   });
 
+  
+  // Paid status state: { [expenseId_monthId]: boolean }
+  const [paidStatus, setPaidStatus] = useState(() => {
+    const saved = localStorage.getItem('finplan_paid_status_v1');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem('finplan_paid_status_v1', JSON.stringify(paidStatus));
+  }, [paidStatus]);
+
+  const handleTogglePaid = (expenseId, monthId) => {
+    const key = `${expenseId}_${monthId}`;
+    setPaidStatus(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   const [banks, setBanks] = useState(() => {
     const saved = localStorage.getItem('finplan_banks_v2') || localStorage.getItem('finplan_banks_v1');
     return saved ? JSON.parse(saved) : INITIAL_BANKS;
@@ -211,6 +230,10 @@ export default function App() {
       setExpenses(backup.expenses);
       localStorage.setItem('finplan_expenses_v2', JSON.stringify(backup.expenses));
     }
+    if (backup.paidStatus) {
+      setPaidStatus(backup.paidStatus);
+      localStorage.setItem('finplan_paid_status_v1', JSON.stringify(backup.paidStatus));
+    }
     if (backup.banks) {
       setBanks(backup.banks);
       localStorage.setItem('finplan_banks_v2', JSON.stringify(backup.banks));
@@ -262,6 +285,7 @@ export default function App() {
         incomesData={incomes}
         expensesData={expenses}
         banksData={banks}
+        paidStatusData={paidStatus}
         onImportBackup={handleImportBackup}
       />
 
@@ -317,6 +341,8 @@ export default function App() {
             onMoveExpense={handleMoveExpense}
             onGroupVehicles={() => setExpenses(prev => groupVehiclesTogether(prev))}
             banks={banks}
+            paidStatus={paidStatus}
+            onTogglePaid={handleTogglePaid}
           />
         )}
 

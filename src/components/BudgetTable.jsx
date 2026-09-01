@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { formatBRL } from '../services/financialMath';
 import { Plus, Trash2, RefreshCw, AlertTriangle, CheckCircle2, Filter, ArrowUpRight, CreditCard, Copy, Calendar, Pencil, Edit3, X, Check, PlusCircle, ChevronUp, ChevronDown, Layers } from 'lucide-react';
 
-function EditableCell({ value = 0, onSave, isIncome = false }) {
+function EditableCell({
+  value = 0,
+  onSave,
+  isIncome = false,
+  isPaid = false,
+  onTogglePaid
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [val, setVal] = useState(value);
 
@@ -30,24 +36,82 @@ function EditableCell({ value = 0, onSave, isIncome = false }) {
         onChange={(e) => setVal(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className="w-28 bg-slate-950 text-emerald-300 font-mono text-xs font-bold px-2.5 py-1 rounded-lg border-2 border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-right shadow-2xl"
+        className="w-28 bg-slate-950 text-emerald-300 font-mono text-xs font-bold px-2 py-1 rounded-lg border-2 border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-right shadow-2xl"
       />
     );
   }
 
   const num = Number(value) || 0;
+  if (num === 0) {
+    return (
+      <div
+        onClick={() => {
+          setVal(value);
+          setIsEditing(true);
+        }}
+        className="cursor-pointer px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition-colors font-mono text-xs font-semibold text-slate-600 hover:text-slate-400 inline-block"
+        title="Clique para definir valor"
+      >
+        -
+      </div>
+    );
+  }
+
+  if (isIncome) {
+    return (
+      <div
+        onClick={() => {
+          setVal(value);
+          setIsEditing(true);
+        }}
+        className="cursor-pointer px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition-colors font-mono text-xs font-bold text-emerald-400 inline-block border border-transparent hover:border-slate-700"
+        title="Clique para editar valor"
+      >
+        {formatBRL(num)}
+      </div>
+    );
+  }
+
   return (
     <div
-      onClick={() => {
-        setVal(value);
-        setIsEditing(true);
-      }}
-      className={`cursor-pointer px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition-colors font-mono text-xs font-semibold inline-block border border-transparent hover:border-slate-700 ${
-        num === 0 ? 'text-slate-500' : isIncome ? 'text-emerald-400' : 'text-slate-100'
+      className={`group inline-flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all border ${
+        isPaid
+          ? 'bg-emerald-950/80 border-emerald-500/70 text-emerald-300 shadow-sm shadow-emerald-950/50'
+          : 'bg-slate-900/60 border-slate-800 hover:bg-slate-800/80 hover:border-slate-700 text-slate-200'
       }`}
-      title="Clique para editar valor"
     >
-      {num === 0 ? '-' : formatBRL(num)}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onTogglePaid) onTogglePaid();
+        }}
+        className={`p-0.5 rounded-md transition-all ${
+          isPaid
+            ? 'text-emerald-400 hover:text-emerald-200 hover:bg-emerald-900/60'
+            : 'text-slate-500 hover:text-emerald-400 hover:bg-slate-800 opacity-60 group-hover:opacity-100'
+        }`}
+        title={isPaid ? 'Conta PAGA ✓ (Clique para desmarcar)' : 'Clique para marcar como PAGA ✓'}
+      >
+        {isPaid ? (
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 fill-emerald-500/20" />
+        ) : (
+          <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-500 hover:border-emerald-400" />
+        )}
+      </button>
+
+      <span
+        onClick={() => {
+          setVal(value);
+          setIsEditing(true);
+        }}
+        className={`cursor-pointer font-mono text-xs font-semibold ${
+          isPaid ? 'text-emerald-300 font-bold' : 'text-slate-100 hover:text-indigo-300'
+        }`}
+        title="Clique no número para editar valor"
+      >
+        {formatBRL(num)}
+      </span>
     </div>
   );
 }
@@ -123,7 +187,9 @@ export default function BudgetTable({
   onReplicateDecTo2027,
   onMoveExpense,
   onGroupVehicles,
-  banks
+  banks,
+  paidStatus = {},
+  onTogglePaid
 }) {
   const [selectedCategory, setSelectedCategory] = useState('TODAS');
   const [selectedBankFilter, setSelectedBankFilter] = useState('TODOS');
@@ -500,6 +566,8 @@ export default function BudgetTable({
                         value={exp.values?.[m.id]}
                         onSave={(nval) => onUpdateExpense(exp.id, m.id, nval)}
                         isIncome={false}
+                        isPaid={Boolean(paidStatus[`${exp.id}_${m.id}`])}
+                        onTogglePaid={() => onTogglePaid && onTogglePaid(exp.id, m.id)}
                       />
                     </td>
                   ))}

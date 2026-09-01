@@ -17,6 +17,7 @@ export default function Header({
   incomesData = [],
   expensesData = [],
   banksData = [],
+  paidStatusData = {},
   onImportBackup
 }) {
   const isDeficit = netBalance < 0;
@@ -29,7 +30,8 @@ export default function Header({
       exportedAt: new Date().toISOString(),
       incomes: incomesData,
       expenses: expensesData,
-      banks: banksData
+      banks: banksData,
+      paidStatus: paidStatusData
     };
     const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
