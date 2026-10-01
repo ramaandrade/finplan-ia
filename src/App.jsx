@@ -52,8 +52,16 @@ export const groupVehiclesTogether = (expenses) => {
 };
 
 export default function App() {
-  const [selectedYear, setSelectedYear] = useState('2027');
-  const [selectedMonth, setSelectedMonth] = useState('JAN_27');
+  const [selectedYear, setSelectedYear] = useState(() => safeStorage.get('finplan_selected_year', '2027'));
+  const [selectedMonth, setSelectedMonth] = useState(() => safeStorage.get('finplan_selected_month', 'JAN_27'));
+
+  useEffect(() => {
+    safeStorage.set('finplan_selected_year', selectedYear);
+  }, [selectedYear]);
+
+  useEffect(() => {
+    safeStorage.set('finplan_selected_month', selectedMonth);
+  }, [selectedMonth]);
   const [activeTab, setActiveTab] = useState('orcamento');
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
 
@@ -222,6 +230,16 @@ export default function App() {
   };
 
   
+  
+  const handleManualSave = () => {
+    safeStorage.set('finplan_incomes_v2', incomes);
+    safeStorage.set('finplan_expenses_v2', expenses);
+    safeStorage.set('finplan_banks_v2', banks);
+    safeStorage.set('finplan_paid_status_v1', paidStatus);
+    setLastSavedTime(new Date().toLocaleTimeString());
+    return true;
+  };
+
   const handleImportBackup = (backup) => {
     if (backup.incomes) {
       setIncomes(backup.incomes);
@@ -288,6 +306,8 @@ export default function App() {
         banksData={banks}
         paidStatusData={paidStatus}
         onImportBackup={handleImportBackup}
+        onManualSave={handleManualSave}
+        lastSavedTime={lastSavedTime}
       />
 
       <div className="border-b border-slate-800/80 bg-slate-900/40 sticky top-0 z-30 backdrop-blur-md">

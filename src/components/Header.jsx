@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Shield, Banknote, TrendingUp, AlertTriangle, Building, RotateCcw, Calendar, ExternalLink, Download, Upload, Database, X } from 'lucide-react';
+import { Shield, Banknote, TrendingUp, AlertTriangle, Building, RotateCcw, Calendar, ExternalLink, Download, Upload, Database, X, Save, Check, Copy } from 'lucide-react';
 import { formatBRL } from '../services/financialMath';
 
 export default function Header({
@@ -18,11 +18,24 @@ export default function Header({
   expensesData = [],
   banksData = [],
   paidStatusData = {},
-  onImportBackup
+  onImportBackup,
+  onManualSave,
+  lastSavedTime
 }) {
   const isDeficit = netBalance < 0;
   const [showSyncModal, setShowSyncModal] = useState(false);
   const fileInputRef = useRef(null);
+
+  const [saveFeedback, setSaveFeedback] = useState(false);
+  const [jsonText, setJsonText] = useState('');
+  const [showJsonBox, setShowJsonBox] = useState(false);
+
+  const handleSaveClick = () => {
+    if (onManualSave) onManualSave();
+    setSaveFeedback(true);
+    setTimeout(() => setSaveFeedback(false), 2000);
+  };
+
 
   const handleExportJson = () => {
     const backupData = {
@@ -154,12 +167,25 @@ export default function Header({
 
             {/* Backup & Sync Button */}
             <button
+              onClick={handleSaveClick}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all shadow-md ${
+                saveFeedback
+                  ? 'bg-emerald-600 text-white scale-105'
+                  : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+              }`}
+              title="Salvar todas as alterações no navegador agora"
+            >
+              {saveFeedback ? <Check className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
+              <span>{saveFeedback ? 'Salvo no Navegador!' : 'Salvar Dados'}</span>
+            </button>
+
+            <button
               onClick={() => setShowSyncModal(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-indigo-950/80 hover:bg-indigo-900/90 text-indigo-300 border border-indigo-700/60 transition-all shadow-sm"
               title="Exportar ou Importar seus dados editados (Backup JSON)"
             >
               <Database className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Backup & Sincronizar</span>
+              <span>Sincronizar Dispositivos</span>
             </button>
 
             <button
@@ -292,6 +318,67 @@ export default function Header({
                 <li>Abra o seu site na Vercel e clique em <strong>"Backup & Sincronizar" ➔ "Carregar Backup"</strong>.</li>
                 <li>Seus dados, nomes e valores editados estarão 100% sincronizados!</li>
               </ol>
+            </div>
+
+            <div className="border-t border-slate-800 pt-3">
+              <button
+                type="button"
+                onClick={() => setShowJsonBox(!showJsonBox)}
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+              >
+                {showJsonBox ? '▼ Ocultar Sincronização por Texto' : '▶ Opção Avançada: Copiar ou Colar Dados em Texto'}
+              </button>
+
+              {showJsonBox && (
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const dataStr = JSON.stringify({
+                          version: '2.0',
+                          incomes: incomesData,
+                          expenses: expensesData,
+                          banks: banksData,
+                          paidStatus: paidStatusData
+                        }, null, 2);
+                        navigator.clipboard.writeText(dataStr);
+                        alert('Dados copiados para a área de transferência! Cole no outro dispositivo.');
+                      }}
+                      className="px-3 py-1 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700"
+                    >
+                      Copiar Tudo para a Área de Transferência
+                    </button>
+                  </div>
+                  <textarea
+                    rows={4}
+                    value={jsonText}
+                    onChange={(e) => setJsonText(e.target.value)}
+                    placeholder="Cole aqui o texto do backup e clique no botão abaixo..."
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-200 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try {
+                        const parsed = JSON.parse(jsonText);
+                        if (parsed.incomes && parsed.expenses && onImportBackup) {
+                          onImportBackup(parsed);
+                          alert('Dados colados e restaurados com sucesso!');
+                          setShowSyncModal(false);
+                        } else {
+                          alert('Formato de texto inválido.');
+                        }
+                      } catch (err) {
+                        alert('Erro ao processar texto: ' + err.message);
+                      }
+                    }}
+                    className="px-3 py-1.5 text-xs font-bold bg-emerald-700 hover:bg-emerald-600 text-white rounded shadow"
+                  >
+                    Restaurar Dados Colados
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end pt-2">
