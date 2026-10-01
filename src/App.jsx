@@ -52,6 +52,32 @@ export const groupVehiclesTogether = (expenses) => {
 };
 
 export default function App() {
+
+  // Attempt background recovery from IndexedDB if localStorage was cleared on close
+  useEffect(() => {
+    async function checkRecovery() {
+      const expSaved = safeStorage.get('finplan_expenses_v2');
+      if (!expSaved) {
+        const idbExpenses = await safeStorage.recoverFromIndexedDB('finplan_expenses_v2');
+        if (idbExpenses && Array.isArray(idbExpenses) && idbExpenses.length > 0) {
+          console.log('Recuperando dados preservados do IndexedDB...');
+          setExpenses(idbExpenses);
+          safeStorage.set('finplan_expenses_v2', idbExpenses);
+        }
+      }
+
+      const incSaved = safeStorage.get('finplan_incomes_v2');
+      if (!incSaved) {
+        const idbIncomes = await safeStorage.recoverFromIndexedDB('finplan_incomes_v2');
+        if (idbIncomes && Array.isArray(idbIncomes) && idbIncomes.length > 0) {
+          setIncomes(idbIncomes);
+          safeStorage.set('finplan_incomes_v2', idbIncomes);
+        }
+      }
+    }
+    checkRecovery();
+  }, []);
+
   const [selectedYear, setSelectedYear] = useState(() => safeStorage.get('finplan_selected_year', '2027'));
   const [selectedMonth, setSelectedMonth] = useState(() => safeStorage.get('finplan_selected_month', 'JAN_27'));
 

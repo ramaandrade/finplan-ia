@@ -112,7 +112,7 @@ export const INITIAL_INCOMES = [
   { id: 'salario', name: 'Salário', type: 'fixed', isRecurring: true, values: populate2027Values({ SET: 8700, OUT: 8700, NOV: 8700, DEZ: 8700 }) },
   { id: 'encerramento_bradesco', name: 'Encerramento de Empréstimo Bradesco', type: 'recurrent', isRecurring: true, values: populate2027Values({ SET: 1340, OUT: 1340, NOV: 1340, DEZ: 1340 }), note: 'Margem líquida liberada / Entrada mensal fixa' },
   { id: 'emprestimo_in', name: 'Empréstimo (Entrada extra)', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
-  { id: 'majoracao', name: 'Majoração', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
+  { id: 'majoracao', name: 'Majoração / Outras Entradas', type: 'recurrent', isRecurring: true, values: populate2027Values({ SET: 1800, OUT: 1800, NOV: 1800, DEZ: 1800 }) },
   { id: 'decimo_terceiro', name: '13º Salário', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 1000 }), note: 'Disponível em Nov/Dez para quitação de empréstimos' },
   { id: 'ferias', name: 'Férias', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
   { id: 'programador', name: 'Programador ? (Freelance)', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }), note: 'Potencial de renda extra' }
@@ -121,7 +121,7 @@ export const INITIAL_INCOMES = [
 export const INITIAL_EXPENSES = [
   // Assinaturas e Utilidades
   { id: 'netflix', name: 'Netflix', category: 'Assinaturas', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 55, OUT: 55, NOV: 55, DEZ: 55 }) },
-  { id: 'energia', name: 'Energia casa', category: 'Moradia', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 180, OUT: 180, NOV: 180, DEZ: 180 }) },
+  { id: 'energia', name: 'Energia casa', category: 'Moradia', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 183, OUT: 183, NOV: 183, DEZ: 183 }) },
   { id: 'agua', name: 'Água Casa', category: 'Moradia', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 56, OUT: 56, NOV: 56, DEZ: 56 }) },
   { id: 'tim', name: 'Tim', category: 'Telecom', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 165, OUT: 165, NOV: 165, DEZ: 165 }) },
   { id: 'brisanet', name: 'Brisanet', category: 'Telecom', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 140, OUT: 140, NOV: 140, DEZ: 140 }) },
