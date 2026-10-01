@@ -16,11 +16,9 @@ function localDiskSavePlugin() {
               const data = JSON.parse(body);
               const targetPath = path.resolve(__dirname, 'src/data/savedUserBudget.json');
               fs.writeFileSync(targetPath, JSON.stringify(data, null, 2), 'utf8');
-              console.log('✓ Orçamento salvo permanentemente no disco local:', new Date().toLocaleTimeString());
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ success: true, savedAt: new Date().toISOString() }));
             } catch (err) {
-              console.error('Erro ao salvar no disco:', err);
               res.statusCode = 500;
               res.end(JSON.stringify({ error: err.message }));
             }
@@ -40,6 +38,9 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
-    host: true
+    host: true,
+    watch: {
+      ignored: ['**/savedUserBudget.json', '**/src/data/savedUserBudget.json']
+    }
   }
 });
