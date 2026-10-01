@@ -97,10 +97,6 @@ export default function App() {
     if (saved && Array.isArray(saved) && saved.length > 0) {
       return saved.map(i => ({ ...i, values: populate2027Values(i.values) }));
     }
-    const oldSaved = safeStorage.get('finplan_incomes_v1');
-    if (oldSaved && Array.isArray(oldSaved) && oldSaved.length > 0) {
-      return oldSaved.map(i => ({ ...i, values: populate2027Values(i.values) }));
-    }
     return INITIAL_INCOMES;
   });
 
@@ -109,10 +105,6 @@ export default function App() {
     const saved = safeStorage.get('finplan_expenses_v2');
     if (saved && Array.isArray(saved) && saved.length > 0) {
       return groupVehiclesTogether(saved.map(e => ({ ...e, values: populate2027Values(e.values) })));
-    }
-    const oldSaved = safeStorage.get('finplan_expenses_v1');
-    if (oldSaved && Array.isArray(oldSaved) && oldSaved.length > 0) {
-      return groupVehiclesTogether(oldSaved.map(e => ({ ...e, values: populate2027Values(e.values) })));
     }
     return INITIAL_EXPENSES;
   });
@@ -140,22 +132,42 @@ export default function App() {
     return (saved && Array.isArray(saved) && saved.length > 0) ? saved : INITIAL_BANKS;
   });
 
+  
+  // Save to disk on localhost via Vite API
+  const saveToDiskIfLocalhost = (data) => {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      fetch('/api/save-budget', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).catch(() => {});
+    }
+  };
+
   const [lastSavedTime, setLastSavedTime] = useState(null);
 
   useEffect(() => {
     safeStorage.set('finplan_incomes_v2', incomes);
     setLastSavedTime(new Date().toLocaleTimeString());
+    saveToDiskIfLocalhost({ incomes, expenses, banks, paidStatus });
   }, [incomes]);
 
   useEffect(() => {
     safeStorage.set('finplan_expenses_v2', expenses);
     setLastSavedTime(new Date().toLocaleTimeString());
+    saveToDiskIfLocalhost({ incomes, expenses, banks, paidStatus });
   }, [expenses]);
 
   useEffect(() => {
     safeStorage.set('finplan_banks_v2', banks);
     setLastSavedTime(new Date().toLocaleTimeString());
+    saveToDiskIfLocalhost({ incomes, expenses, banks, paidStatus });
   }, [banks]);
+
+  useEffect(() => {
+    safeStorage.set('finplan_paid_status_v1', paidStatus);
+    saveToDiskIfLocalhost({ incomes, expenses, banks, paidStatus });
+  }, [paidStatus]);
 
   // Determine visible months based on selectedYear
   const visibleMonths = selectedYear === '2026'
@@ -263,6 +275,7 @@ export default function App() {
     safeStorage.set('finplan_banks_v2', banks);
     safeStorage.set('finplan_paid_status_v1', paidStatus);
     setLastSavedTime(new Date().toLocaleTimeString());
+    saveToDiskIfLocalhost({ incomes, expenses, banks, paidStatus });
     return true;
   };
 

@@ -1,3 +1,4 @@
+import savedUserBudget from './savedUserBudget.json';
 // Meses de 2026 e 2027
 export const MONTHS_2026 = [
   { id: 'SET', label: 'SET (Setembro/26)', short: 'SET', monthName: 'Setembro', year: 2026 },
@@ -108,7 +109,7 @@ export const INITIAL_BANKS = [
   }
 ];
 
-export const INITIAL_INCOMES = [
+export const INITIAL_INCOMES = (savedUserBudget && savedUserBudget.incomes && savedUserBudget.incomes.length > 0) ? savedUserBudget.incomes : [
   { id: 'salario', name: 'Salário', type: 'fixed', isRecurring: true, values: populate2027Values({ SET: 8700, OUT: 8700, NOV: 8700, DEZ: 8700 }) },
   { id: 'encerramento_bradesco', name: 'Encerramento de Empréstimo Bradesco', type: 'recurrent', isRecurring: true, values: populate2027Values({ SET: 1340, OUT: 1340, NOV: 1340, DEZ: 1340 }), note: 'Margem líquida liberada / Entrada mensal fixa' },
   { id: 'emprestimo_in', name: 'Empréstimo (Entrada extra)', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }) },
@@ -118,7 +119,7 @@ export const INITIAL_INCOMES = [
   { id: 'programador', name: 'Programador ? (Freelance)', type: 'extra', isRecurring: false, values: populate2027Values({ SET: 0, OUT: 0, NOV: 0, DEZ: 0 }), note: 'Potencial de renda extra' }
 ];
 
-export const INITIAL_EXPENSES = [
+export const INITIAL_EXPENSES = (savedUserBudget && savedUserBudget.expenses && savedUserBudget.expenses.length > 0) ? savedUserBudget.expenses : [
   // Assinaturas e Utilidades
   { id: 'netflix', name: 'Netflix', category: 'Assinaturas', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 55, OUT: 55, NOV: 55, DEZ: 55 }) },
   { id: 'energia', name: 'Energia casa', category: 'Moradia', bank: 'Outros', isDebt: false, values: populate2027Values({ SET: 183, OUT: 183, NOV: 183, DEZ: 183 }) },
