@@ -7,6 +7,7 @@ import AiAdvisorPanel from './components/AiAdvisorPanel';
 import DebtStrategySim from './components/DebtStrategySim';
 import NegotiationScripts from './components/NegotiationScripts';
 import CashFlowProjection from './components/CashFlowProjection';
+import { safeStorage } from './services/storageService';
 import { 
   MONTHS_2026, 
   MONTHS_2027, 
@@ -58,30 +59,26 @@ export default function App() {
 
   // Incomes state
   const [incomes, setIncomes] = useState(() => {
-    const saved = localStorage.getItem('finplan_incomes_v2');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.map(i => ({ ...i, values: populate2027Values(i.values) }));
+    const saved = safeStorage.get('finplan_incomes_v2');
+    if (saved && Array.isArray(saved) && saved.length > 0) {
+      return saved.map(i => ({ ...i, values: populate2027Values(i.values) }));
     }
-    const oldSaved = localStorage.getItem('finplan_incomes_v1');
-    if (oldSaved) {
-      const parsed = JSON.parse(oldSaved);
-      return parsed.map(i => ({ ...i, values: populate2027Values(i.values) }));
+    const oldSaved = safeStorage.get('finplan_incomes_v1');
+    if (oldSaved && Array.isArray(oldSaved) && oldSaved.length > 0) {
+      return oldSaved.map(i => ({ ...i, values: populate2027Values(i.values) }));
     }
     return INITIAL_INCOMES;
   });
 
   // Expenses state
   const [expenses, setExpenses] = useState(() => {
-    const saved = localStorage.getItem('finplan_expenses_v2');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return groupVehiclesTogether(parsed.map(e => ({ ...e, values: populate2027Values(e.values) })));
+    const saved = safeStorage.get('finplan_expenses_v2');
+    if (saved && Array.isArray(saved) && saved.length > 0) {
+      return groupVehiclesTogether(saved.map(e => ({ ...e, values: populate2027Values(e.values) })));
     }
-    const oldSaved = localStorage.getItem('finplan_expenses_v1');
-    if (oldSaved) {
-      const parsed = JSON.parse(oldSaved);
-      return groupVehiclesTogether(parsed.map(e => ({ ...e, values: populate2027Values(e.values) })));
+    const oldSaved = safeStorage.get('finplan_expenses_v1');
+    if (oldSaved && Array.isArray(oldSaved) && oldSaved.length > 0) {
+      return groupVehiclesTogether(oldSaved.map(e => ({ ...e, values: populate2027Values(e.values) })));
     }
     return INITIAL_EXPENSES;
   });
@@ -89,12 +86,11 @@ export default function App() {
   
   // Paid status state: { [expenseId_monthId]: boolean }
   const [paidStatus, setPaidStatus] = useState(() => {
-    const saved = localStorage.getItem('finplan_paid_status_v1');
-    return saved ? JSON.parse(saved) : {};
+    return safeStorage.get('finplan_paid_status_v1', {});
   });
 
   useEffect(() => {
-    localStorage.setItem('finplan_paid_status_v1', JSON.stringify(paidStatus));
+    safeStorage.set('finplan_paid_status_v1', paidStatus);
   }, [paidStatus]);
 
   const handleTogglePaid = (expenseId, monthId) => {
@@ -106,20 +102,25 @@ export default function App() {
   };
 
   const [banks, setBanks] = useState(() => {
-    const saved = localStorage.getItem('finplan_banks_v2') || localStorage.getItem('finplan_banks_v1');
-    return saved ? JSON.parse(saved) : INITIAL_BANKS;
+    const saved = safeStorage.get('finplan_banks_v2') || safeStorage.get('finplan_banks_v1');
+    return (saved && Array.isArray(saved) && saved.length > 0) ? saved : INITIAL_BANKS;
   });
 
+  const [lastSavedTime, setLastSavedTime] = useState(null);
+
   useEffect(() => {
-    localStorage.setItem('finplan_incomes_v2', JSON.stringify(incomes));
+    safeStorage.set('finplan_incomes_v2', incomes);
+    setLastSavedTime(new Date().toLocaleTimeString());
   }, [incomes]);
 
   useEffect(() => {
-    localStorage.setItem('finplan_expenses_v2', JSON.stringify(expenses));
+    safeStorage.set('finplan_expenses_v2', expenses);
+    setLastSavedTime(new Date().toLocaleTimeString());
   }, [expenses]);
 
   useEffect(() => {
-    localStorage.setItem('finplan_banks_v2', JSON.stringify(banks));
+    safeStorage.set('finplan_banks_v2', banks);
+    setLastSavedTime(new Date().toLocaleTimeString());
   }, [banks]);
 
   // Determine visible months based on selectedYear

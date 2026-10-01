@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { formatBRL } from '../services/financialMath';
+import { parseBrazilianNumber } from '../services/storageService';
 import { Plus, Trash2, RefreshCw, AlertTriangle, CheckCircle2, Filter, ArrowUpRight, CreditCard, Copy, Calendar, Pencil, Edit3, X, Check, PlusCircle, ChevronUp, ChevronDown, Layers } from 'lucide-react';
 
 function EditableCell({
@@ -12,9 +13,14 @@ function EditableCell({
   const [isEditing, setIsEditing] = useState(false);
   const [val, setVal] = useState(value);
 
+  React.useEffect(() => {
+    setVal(value);
+  }, [value]);
+
   const handleBlur = () => {
     setIsEditing(false);
-    onSave(Number(val) || 0);
+    const parsed = parseBrazilianNumber(val);
+    onSave(parsed);
   };
 
   const handleKeyDown = (e) => {
@@ -28,8 +34,8 @@ function EditableCell({
   if (isEditing) {
     return (
       <input
-        type="number"
-        step="any"
+        type="text"
+        inputMode="decimal"
         autoFocus
         onFocus={(e) => e.target.select()}
         value={val}
@@ -37,6 +43,7 @@ function EditableCell({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         className="w-28 bg-slate-950 text-emerald-300 font-mono text-xs font-bold px-2 py-1 rounded-lg border-2 border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-right shadow-2xl"
+        placeholder="0,00"
       />
     );
   }
@@ -46,7 +53,7 @@ function EditableCell({
     return (
       <div
         onClick={() => {
-          setVal(value);
+          setVal(value || '');
           setIsEditing(true);
         }}
         className="cursor-pointer px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition-colors font-mono text-xs font-semibold text-slate-600 hover:text-slate-400 inline-block"
@@ -119,6 +126,10 @@ function EditableCell({
 function EditableText({ value = '', onSave, placeholder = 'Nome do item...', className = '' }) {
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState(value);
+
+  React.useEffect(() => {
+    setText(value);
+  }, [value]);
 
   const handleBlur = () => {
     setIsEditing(false);
@@ -274,9 +285,14 @@ export default function BudgetTable({
               <h3 className="text-white font-semibold text-sm">
                 Gerenciamento Completo de Despesas, Receitas & Valores
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Acrescente novas contas pelo botão <strong>+ Nova Despesa</strong>, exclua itens desnecessários no ícone da <strong>lixeira</strong> ou edite textos com 1 clique.
-              </p>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-700/60">
+                  <CheckCircle2 className="w-3 h-3" /> Salvamento Automático Ativo
+                </span>
+                <p className="text-xs text-slate-400">
+                  Acrescente novas contas pelo botão <strong>+ Nova Despesa</strong>, exclua itens no ícone da <strong>lixeira</strong> ou edite valores.
+                </p>
+              </div>
             </div>
           </div>
 
